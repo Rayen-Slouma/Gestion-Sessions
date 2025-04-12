@@ -8,6 +8,9 @@ import { theme } from './theme';
 // Layouts
 import MainLayout from './layouts/MainLayout';
 import AuthLayout from './layouts/AuthLayout';
+import AdminLayout from './layouts/AdminLayout';
+import TeacherLayout from './layouts/TeacherLayout';
+import StudentLayout from './layouts/StudentLayout';
 
 // Authentication pages
 import Login from './pages/auth/Login';
@@ -16,6 +19,12 @@ import Login from './pages/auth/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import UserManagement from './pages/admin/UserManagement';
 import ScheduleGeneration from './pages/admin/ScheduleGeneration';
+import ClassroomManagement from './pages/admin/ClassroomManagement';
+import SubjectManagement from './pages/admin/SubjectManagement';
+import GroupManagement from './pages/admin/GroupManagement';
+import DepartmentManagement from './pages/admin/DepartmentManagement';
+import SectionManagement from './pages/admin/SectionManagement';
+import SessionFormPage from './pages/admin/SessionFormPage';
 
 // Teacher pages
 import TeacherDashboard from './pages/teacher/Dashboard';
@@ -23,8 +32,8 @@ import AvailabilityForm from './pages/teacher/AvailabilityForm';
 import SupervisionSchedule from './pages/teacher/SupervisionSchedule';
 
 // Student pages
-import StudentDashboard from './pages/student/Dashboard';
 import ExamSchedule from './pages/student/ExamSchedule';
+import Profile from './pages/student/Profile';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
@@ -54,21 +63,28 @@ const App: React.FC = () => {
               {/* Admin Routes */}
               <Route path="/admin" element={
                 <PrivateRoute role="admin">
-                  <MainLayout />
+                  <AdminLayout />
                 </PrivateRoute>
               }>
                 <Route index element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="users" element={<UserManagement />} />
+                <Route path="departments" element={<DepartmentManagement />} />
+                <Route path="sections" element={<SectionManagement />} />
+                <Route path="subjects" element={<SubjectManagement />} />
+                <Route path="groups" element={<GroupManagement />} />
+                <Route path="classrooms" element={<ClassroomManagement />} />
                 <Route path="schedule" element={<ScheduleGeneration />} />
+                <Route path="session-form" element={<SessionFormPage />} />
               </Route>
 
               {/* Teacher Routes */}
               <Route path="/teacher" element={
                 <PrivateRoute role="teacher">
-                  <MainLayout />
+                  <TeacherLayout />
                 </PrivateRoute>
               }>
-                <Route index element={<TeacherDashboard />} />
+                <Route index element={<Navigate to="/teacher/supervision" replace />} />
                 <Route path="availability" element={<AvailabilityForm />} />
                 <Route path="supervision" element={<SupervisionSchedule />} />
               </Route>
@@ -76,11 +92,12 @@ const App: React.FC = () => {
               {/* Student Routes */}
               <Route path="/student" element={
                 <PrivateRoute role="student">
-                  <MainLayout />
+                  <StudentLayout />
                 </PrivateRoute>
               }>
-                <Route index element={<StudentDashboard />} />
+                <Route index element={<Navigate to="/student/exams" replace />} />
                 <Route path="exams" element={<ExamSchedule />} />
+                <Route path="profile" element={<Profile />} />
               </Route>
 
               {/* Catch-all route */}

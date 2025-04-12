@@ -30,7 +30,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, role }) => {
       case 'admin':
         return <Navigate to="/admin" replace />;
       case 'teacher':
-        return <Navigate to="/teacher" replace />;
+        return <Navigate to="/teacher/supervision" replace />;
       case 'student':
         return <Navigate to="/student" replace />;
       default:

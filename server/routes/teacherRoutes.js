@@ -6,7 +6,9 @@ const {
   updateTeacher,
   deleteTeacher,
   updateAvailability,
-  getAvailability
+  getAvailability,
+  getSpecialOccasions,
+  updateSpecialOccasions
 } = require('../controllers/teacherController');
 
 const { protect, authorize } = require('../middleware/auth');
@@ -31,9 +33,19 @@ router.route('/:id/availability')
   .get(authorize('admin', 'teacher'), getAvailability)
   .put(authorize('admin', 'teacher'), updateAvailability);
 
+// Routes for special occasions
+router.route('/:id/special-occasions')
+  .get(authorize('admin', 'teacher'), getSpecialOccasions)
+  .put(authorize('admin', 'teacher'), updateSpecialOccasions);
+
 // Teacher can see and update their own availability
 router.route('/me/availability')
   .get(authorize('teacher'), getAvailability)
   .put(authorize('teacher'), updateAvailability);
+
+// Teacher can see and update their own special occasions
+router.route('/me/special-occasions')
+  .get(authorize('teacher'), getSpecialOccasions)
+  .put(authorize('teacher'), updateSpecialOccasions);
 
 module.exports = router;

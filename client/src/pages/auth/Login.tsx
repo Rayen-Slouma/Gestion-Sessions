@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Box, TextField, Button, Typography, Alert, CircularProgress,
   Divider, Paper, Stack
 } from '@mui/material';
@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       if (user.role === 'admin') {
         navigate('/admin');
       } else if (user.role === 'teacher') {
-        navigate('/teacher');
+        navigate('/teacher/supervision');
       } else {
         navigate('/student');
       }
@@ -52,19 +52,19 @@ const Login: React.FC = () => {
   // Handlers for quick test logins
   const handleTestAdminLogin = async () => {
     setIsSubmitting(true);
-    await login('admin@example.com', 'admin0');
+    await login('admin@example.com', 'admin123');
     setIsSubmitting(false);
   };
 
   const handleTestTeacherLogin = async () => {
     setIsSubmitting(true);
-    await login('teacher@example.com', 'teacher0');
+    await login('john.smith@example.com', 'teacher123');
     setIsSubmitting(false);
   };
 
   const handleTestStudentLogin = async () => {
     setIsSubmitting(true);
-    await login('student@example.com', 'student0');
+    await login('alice.johnson@example.com', 'student123');
     setIsSubmitting(false);
   };
 
@@ -92,13 +92,13 @@ const Login: React.FC = () => {
       <Typography variant="h6" gutterBottom fontWeight={600}>
         Sign In
       </Typography>
-      
+
       {error && (
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
           <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
         </motion.div>
       )}
-      
+
       <motion.div custom={1} variants={inputVariants} initial="initial" animate="animate">
         <TextField
           margin="normal"
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
           helperText={formik.touched.email && formik.errors.email}
         />
       </motion.div>
-      
+
       <motion.div custom={2} variants={inputVariants} initial="initial" animate="animate">
         <TextField
           margin="normal"
@@ -132,16 +132,16 @@ const Login: React.FC = () => {
           helperText={formik.touched.password && formik.errors.password}
         />
       </motion.div>
-      
+
       <motion.div custom={3} variants={inputVariants} initial="initial" animate="animate">
         <Button
           type="submit"
           fullWidth
           variant="contained"
           disabled={isSubmitting}
-          sx={{ 
-            mt: 3, 
-            mb: 2, 
+          sx={{
+            mt: 3,
+            mb: 2,
             py: 1.2,
             background: 'linear-gradient(90deg, #2563eb, #4f46e5)'
           }}
@@ -149,7 +149,7 @@ const Login: React.FC = () => {
           {isSubmitting ? <CircularProgress size={24} /> : "Sign In"}
         </Button>
       </motion.div>
-      
+
       {/* TEST LOGIN - REMOVE IN PRODUCTION */}
       <motion.div custom={4} variants={inputVariants} initial="initial" animate="animate">
         <Divider sx={{ my: 2 }} />
@@ -161,11 +161,11 @@ const Login: React.FC = () => {
             Quick login with test accounts
           </Typography>
           <Stack spacing={1} sx={{ mt: 1 }}>
-            <MotionButton 
-              size="small" 
-              variant="outlined" 
-              color="warning" 
-              onClick={handleTestAdminLogin} 
+            <MotionButton
+              size="small"
+              variant="outlined"
+              color="warning"
+              onClick={handleTestAdminLogin}
               disabled={isSubmitting}
               variants={testButtonVariants}
               whileHover="hover"
@@ -174,11 +174,11 @@ const Login: React.FC = () => {
             >
               {isSubmitting ? <CircularProgress size={20} /> : "Login as Admin"}
             </MotionButton>
-            <MotionButton 
-              size="small" 
-              variant="outlined" 
-              color="info" 
-              onClick={handleTestTeacherLogin} 
+            <MotionButton
+              size="small"
+              variant="outlined"
+              color="info"
+              onClick={handleTestTeacherLogin}
               disabled={isSubmitting}
               variants={testButtonVariants}
               whileHover="hover"
@@ -187,11 +187,11 @@ const Login: React.FC = () => {
             >
               {isSubmitting ? <CircularProgress size={20} /> : "Login as Teacher"}
             </MotionButton>
-            <MotionButton 
-              size="small" 
-              variant="outlined" 
-              color="success" 
-              onClick={handleTestStudentLogin} 
+            <MotionButton
+              size="small"
+              variant="outlined"
+              color="success"
+              onClick={handleTestStudentLogin}
               disabled={isSubmitting}
               variants={testButtonVariants}
               whileHover="hover"

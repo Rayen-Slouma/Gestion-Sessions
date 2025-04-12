@@ -8,19 +8,23 @@ const ClassroomSchema = new mongoose.Schema({
   },
   building: {
     type: String,
-    required: true
+    required: false
   },
   floor: {
     type: Number,
-    required: true
+    required: false
   },
   capacity: {
     type: Number,
     required: true
   },
+  department: {
+    type: String,
+    default: ''
+  },
   features: [{
     type: String,
-    enum: ['projector', 'computers', 'whiteboard', 'accessibility', 'air_conditioning']
+    enum: ['projector', 'computers', 'whiteboard', 'air_conditioning', 'heating', 'internet']
   }],
   availability: {
     type: Boolean,

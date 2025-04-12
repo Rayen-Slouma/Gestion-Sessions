@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, Typography, Paper, Button, 
-  Table, TableBody, TableCell, TableContainer, 
+import {
+  Box, Typography, Paper, Button,
+  Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, TablePagination,
-  IconButton, Dialog, DialogActions, 
+  IconButton, Dialog, DialogActions,
   DialogContent, DialogTitle, TextField, Select, MenuItem, FormControl, InputLabel,
   CircularProgress, Snackbar, Alert, Fab, Chip, SelectChangeEvent, Grid,
   OutlinedInput, InputAdornment, Tooltip, Card, CardContent
 } from '@mui/material';
-import { 
-  Add as AddIcon, 
-  Edit as EditIcon, 
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
   FilterList as FilterListIcon,
@@ -40,7 +40,9 @@ const UserManagement: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -57,20 +59,20 @@ const UserManagement: React.FC = () => {
 
   const filterUsers = () => {
     let result = [...users];
-    
+
     // Filter by search query (case-insensitive)
     if (searchQuery) {
-      result = result.filter(user => 
+      result = result.filter(user =>
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     // Filter by role
     if (roleFilter !== 'all') {
       result = result.filter(user => user.role === roleFilter);
     }
-    
+
     setFilteredUsers(result);
     // Reset to first page when filters change
     setPage(0);
@@ -79,21 +81,34 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Mock data for demonstration
-      setUsers([
-        { _id: '1', name: 'Admin User', email: 'admin@example.com', role: 'admin', createdAt: '2023-01-01' },
-        { _id: '2', name: 'Teacher One', email: 'teacher1@example.com', role: 'teacher', createdAt: '2023-01-02' },
-        { _id: '3', name: 'Student One', email: 'student1@example.com', role: 'student', createdAt: '2023-01-03' },
-        { _id: '4', name: 'Teacher Two', email: 'teacher2@example.com', role: 'teacher', createdAt: '2023-01-04' },
-        { _id: '5', name: 'Student Two', email: 'student2@example.com', role: 'student', createdAt: '2023-01-05' },
-        { _id: '6', name: 'Student Three', email: 'student3@example.com', role: 'student', createdAt: '2023-01-06' },
-        { _id: '7', name: 'Admin Second', email: 'admin2@example.com', role: 'admin', createdAt: '2023-01-07' },
-        { _id: '8', name: 'Teacher Three', email: 'teacher3@example.com', role: 'teacher', createdAt: '2023-01-08' }
-      ]);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const data = await response.json();
+      console.log('Fetched users data:', data);
+
+      if (data.success) {
+        setUsers(data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch users');
+      }
+
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
-      showSnackbar('Error loading users', 'error');
+      showSnackbar('Error loading users: ' + (error instanceof Error ? error.message : 'Unknown error'), 'error');
       setLoading(false);
     }
   };
@@ -123,7 +138,7 @@ const UserManagement: React.FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -150,13 +165,50 @@ const UserManagement: React.FC = () => {
     setOpenDialog(true);
   };
 
-  const handleDeleteUser = async (id: string) => {
+  const handleDeleteClick = (id: string) => {
+    setUserToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
     try {
-      setUsers(users.filter(user => user._id !== id));
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/users/${userToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete user');
+      }
+
+      // Use the data returned from the API
+      console.log('User deleted:', data);
+
+      // Refresh the user list
+      fetchUsers();
       showSnackbar('User deleted successfully', 'success');
     } catch (error) {
       console.error('Error deleting user:', error);
-      showSnackbar('Error deleting user', 'error');
+      showSnackbar('Error deleting user: ' + (error instanceof Error ? error.message : 'Unknown error'), 'error');
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
   };
 
@@ -165,11 +217,7 @@ const UserManagement: React.FC = () => {
     setSelectedUser(null);
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
-    const name = e.target.name as string;
-    const value = e.target.value;
-    setFormData({ ...formData, [name]: value });
-  };
+  // The form uses handleTextFieldChange and handleSelectChange instead of a generic handleFormChange
 
   const handleTextFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -183,25 +231,144 @@ const UserManagement: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      if (isNewUser) {
-        const newUser = {
-          _id: Date.now().toString(),
-          ...formData,
-          createdAt: new Date().toISOString()
-        };
-        setUsers([...users, newUser]);
-        showSnackbar('User created successfully', 'success');
-      } else if (selectedUser) {
-        setUsers(users.map(user => 
-          user._id === selectedUser._id ? { ...user, ...formData } : user
-        ));
-        showSnackbar('User updated successfully', 'success');
+      // Validate form data
+      if (!formData.name || !formData.email || (isNewUser && !formData.password) || !formData.role) {
+        showSnackbar('Please fill in all required fields', 'error');
+        return;
       }
-      
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+      if (isNewUser) {
+        // Create new user
+        const userResponse = await fetch(`${apiUrl}/api/users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const userData = await userResponse.json();
+
+        if (!userResponse.ok) {
+          throw new Error(userData.message || 'Failed to create user');
+        }
+
+        console.log('User created:', userData);
+
+        // If the user is a teacher, create a teacher profile
+        if (formData.role === 'teacher' && userData.success && userData.data) {
+          try {
+            const teacherData = {
+              user: userData.data._id,
+              department: 'Not specified', // Default department
+              availability: [],
+              supervisionPreferences: {
+                maxExamsPerDay: 2
+              }
+            };
+
+            const teacherResponse = await fetch(`${apiUrl}/api/teachers`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(teacherData)
+            });
+
+            const teacherResult = await teacherResponse.json();
+
+            if (!teacherResponse.ok) {
+              console.error('Failed to create teacher profile:', teacherResult);
+              showSnackbar('User created but failed to create teacher profile', 'warning');
+            } else {
+              console.log('Teacher profile created:', teacherResult);
+              showSnackbar('Teacher created successfully with profile', 'success');
+            }
+          } catch (teacherError) {
+            console.error('Error creating teacher profile:', teacherError);
+            showSnackbar('User created but failed to create teacher profile', 'warning');
+          }
+        } else {
+          showSnackbar('User created successfully', 'success');
+        }
+      } else if (selectedUser) {
+        // Update existing user
+        const response = await fetch(`${apiUrl}/api/users/${selectedUser._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to update user');
+        }
+
+        console.log('User updated:', data);
+
+        // If role changed to teacher, check if teacher profile exists and create if not
+        if (formData.role === 'teacher' && selectedUser.role !== 'teacher') {
+          try {
+            const teacherData = {
+              user: selectedUser._id,
+              department: 'Not specified', // Default department
+              availability: [],
+              supervisionPreferences: {
+                maxExamsPerDay: 2
+              }
+            };
+
+            const teacherResponse = await fetch(`${apiUrl}/api/teachers`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(teacherData)
+            });
+
+            const teacherResult = await teacherResponse.json();
+
+            if (!teacherResponse.ok) {
+              // If error is not about duplicate teacher profile
+              if (!teacherResult.message?.includes('already exists')) {
+                console.error('Failed to create teacher profile:', teacherResult);
+                showSnackbar('User updated but failed to create teacher profile', 'warning');
+              } else {
+                showSnackbar('User updated successfully', 'success');
+              }
+            } else {
+              console.log('Teacher profile created:', teacherResult);
+              showSnackbar('User updated and teacher profile created', 'success');
+            }
+          } catch (teacherError) {
+            console.error('Error creating teacher profile:', teacherError);
+            showSnackbar('User updated but failed to create teacher profile', 'warning');
+          }
+        } else {
+          showSnackbar('User updated successfully', 'success');
+        }
+      }
+
+      // Refresh the user list
+      fetchUsers();
       handleDialogClose();
     } catch (error) {
       console.error('Error submitting user data:', error);
-      showSnackbar('Error saving user data', 'error');
+      showSnackbar('Error saving user data: ' + (error instanceof Error ? error.message : 'Unknown error'), 'error');
     }
   };
 
@@ -237,8 +404,8 @@ const UserManagement: React.FC = () => {
             >
               <FilterListIcon />
             </MotionFab>
-            <MotionFab 
-              color="primary" 
+            <MotionFab
+              color="primary"
               aria-label="add user"
               onClick={handleOpenCreateDialog}
               whileHover={{ scale: 1.05 }}
@@ -249,9 +416,9 @@ const UserManagement: React.FC = () => {
           </Box>
         </Box>
       </motion.div>
-      
+
       {showFilters && (
-        <MotionCard 
+        <MotionCard
           sx={{ mb: 3 }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -308,9 +475,9 @@ const UserManagement: React.FC = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12} md={2}>
-                <Button 
-                  fullWidth 
-                  variant="outlined" 
+                <Button
+                  fullWidth
+                  variant="outlined"
                   onClick={clearFilters}
                   startIcon={<ClearIcon />}
                 >
@@ -331,7 +498,7 @@ const UserManagement: React.FC = () => {
           </CardContent>
         </MotionCard>
       )}
-      
+
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -363,9 +530,9 @@ const UserManagement: React.FC = () => {
                           <TableCell>{user.name}</TableCell>
                           <TableCell>{user.email}</TableCell>
                           <TableCell>
-                            <Chip 
-                              label={user.role} 
-                              size="small" 
+                            <Chip
+                              label={user.role}
+                              size="small"
                               color={getRoleColor(user.role) as any}
                             />
                           </TableCell>
@@ -377,7 +544,7 @@ const UserManagement: React.FC = () => {
                               </IconButton>
                             </Tooltip>
                             <Tooltip title="Delete">
-                              <IconButton onClick={() => handleDeleteUser(user._id)} size="small" color="error">
+                              <IconButton onClick={() => handleDeleteClick(user._id)} size="small" color="error">
                                 <DeleteIcon />
                               </IconButton>
                             </Tooltip>
@@ -407,7 +574,7 @@ const UserManagement: React.FC = () => {
           )}
         </Paper>
       </motion.div>
-      
+
       <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="sm" fullWidth>
         <DialogTitle>{isNewUser ? 'Create New User' : 'Edit User'}</DialogTitle>
         <DialogContent>
@@ -464,9 +631,30 @@ const UserManagement: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Box sx={{ p: 1 }}>
+            Are you sure you want to delete this user? This action cannot be undone.
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button onClick={handleDeleteUser} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >

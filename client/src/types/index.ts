@@ -25,10 +25,11 @@ export interface Classroom {
   _id: string;
   roomNumber: string;
   building: string;
-  floor?: number;
+  floor: number;
   capacity: number;
-  features?: string[];
-  availability?: boolean;
+  department?: string;
+  features: string[];
+  availability: boolean;
 }
 
 export interface Group {
@@ -104,6 +105,7 @@ export interface DashboardStats {
     groups: number;
     classrooms: number;
     sessions: number;
+    departments: number;
   };
   upcomingSessions: {
     id: string;
@@ -112,17 +114,24 @@ export interface DashboardStats {
     time: string;
     classroom: string;
     groups: string;
+    status?: 'scheduled' | 'ongoing' | 'completed' | 'cancelled' | 'devoir_surveille' | 'examen_tp' | 'examen_principal' | 'examen_rattrapage';
+    calculatedStatus?: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
+    originalStatus?: string;
+    supervisors?: string;
+    sections?: string;
+    examDuration?: number;
+    originalData?: any;
   }[];
   sessionsByStatus: {
-    scheduled?: number;
-    ongoing?: number;
-    completed?: number;
-    cancelled?: number;
+    scheduled: number;
+    ongoing: number;
+    completed: number;
+    cancelled: number;
   };
   usersByRole: {
-    admin?: number;
-    teacher?: number;
-    student?: number;
+    admin: number;
+    teacher: number;
+    student: number;
   };
 }
 

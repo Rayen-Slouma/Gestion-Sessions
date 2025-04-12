@@ -56,6 +56,12 @@ exports.createSubject = async (req, res, next) => {
       data: subject
     });
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'A subject with this code already exists. Subject codes must be unique, but subject names can be duplicated.'
+      });
+    }
     next(err);
   }
 };
@@ -82,6 +88,12 @@ exports.updateSubject = async (req, res, next) => {
       data: subject
     });
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'A subject with this code already exists. Subject codes must be unique, but subject names can be duplicated.'
+      });
+    }
     next(err);
   }
 };

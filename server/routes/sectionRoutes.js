@@ -1,93 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
-
-// @desc    Placeholder for section routes
-// Note: These would typically be implemented in a sectionController.js file
-// and then imported here
+const {
+  getSections,
+  getSection,
+  getSectionsByDepartment,
+  createSection,
+  updateSection,
+  deleteSection
+} = require('../controllers/sectionController');
 
 // Protect all routes
 router.use(protect);
 
-// GET all sections
-router.get('/', async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      message: 'This route will return all sections',
-      data: []
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
-  }
-});
-
-// GET single section
-router.get('/:id', async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      message: `This route will return the section with id ${req.params.id}`,
-      data: {}
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
-  }
-});
+// Public routes
+router.get('/', getSections);
+router.get('/department/:departmentId', getSectionsByDepartment);
+router.get('/:id', getSection);
 
 // Admin-only routes
-// CREATE section
-router.post('/', authorize('admin'), async (req, res) => {
-  try {
-    res.status(201).json({
-      success: true,
-      message: 'This route will create a new section',
-      data: req.body
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
-  }
-});
-
-// UPDATE section
-router.put('/:id', authorize('admin'), async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      message: `This route will update the section with id ${req.params.id}`,
-      data: req.body
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
-  }
-});
-
-// DELETE section
-router.delete('/:id', authorize('admin'), async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      message: `This route will delete the section with id ${req.params.id}`,
-      data: {}
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
-  }
-});
+router.post('/', authorize('admin'), createSection);
+router.put('/:id', authorize('admin'), updateSection);
+router.delete('/:id', authorize('admin'), deleteSection);
 
 module.exports = router;

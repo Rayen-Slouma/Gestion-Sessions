@@ -31,8 +31,7 @@ exports.getTeacher = async (req, res, next) => {
         path: 'user',
         select: 'name email'
       })
-      .populate('subjects')
-      .populate('supervisionPreferences.preferredRooms');
+      .populate('subjects');
 
     if (!teacher) {
       return res.status(404).json({
@@ -199,6 +198,67 @@ exports.getAvailability = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: teacher.availability
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get teacher's special occasions
+// @route   GET /api/teachers/:id/special-occasions
+// @access  Private
+exports.getSpecialOccasions = async (req, res, next) => {
+  try {
+    let teacher;
+
+    if (req.user.role === 'teacher') {
+      teacher = await Teacher.findOne({ user: req.user.id });
+    } else {
+      teacher = await Teacher.findById(req.params.id);
+    }
+
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: 'Teacher profile not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: teacher.specialOccasions || []
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Update teacher's special occasions
+// @route   PUT /api/teachers/:id/special-occasions
+// @access  Private/Teacher
+exports.updateSpecialOccasions = async (req, res, next) => {
+  try {
+    let teacher = await Teacher.findOne({ user: req.user.id });
+
+    // Allow admins to update any teacher's special occasions
+    if (req.user.role === 'admin' && req.params.id) {
+      teacher = await Teacher.findById(req.params.id);
+    }
+
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: 'Teacher profile not found'
+      });
+    }
+
+    teacher.specialOccasions = req.body.specialOccasions;
+
+    await teacher.save();
+
+    res.status(200).json({
+      success: true,
+      data: teacher
     });
   } catch (err) {
     next(err);

@@ -16,6 +16,29 @@ const AvailabilitySchema = new mongoose.Schema({
   }
 });
 
+const SpecialOccasionSchema = new mongoose.Schema({
+  date: {
+    type: Date,
+    required: true
+  },
+  startTime: {
+    type: String,
+    required: true
+  },
+  endTime: {
+    type: String,
+    required: true
+  },
+  isAvailable: {
+    type: Boolean,
+    default: false
+  },
+  reason: {
+    type: String,
+    required: true
+  }
+});
+
 const TeacherSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -32,16 +55,7 @@ const TeacherSchema = new mongoose.Schema({
     ref: 'Subject'
   }],
   availability: [AvailabilitySchema],
-  supervisionPreferences: {
-    maxExamsPerDay: {
-      type: Number,
-      default: 2
-    },
-    preferredRooms: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Classroom'
-    }]
-  }
+  specialOccasions: [SpecialOccasionSchema]
 });
 
 module.exports = mongoose.model('Teacher', TeacherSchema);
