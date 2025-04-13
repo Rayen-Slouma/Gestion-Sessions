@@ -31,3 +31,8 @@ yarn-error.log*
 # Cache
 .cache/
 .npm/
+
+# Database diagram files
+DATABASE_DIAGRAM.mmd
+DATABASE_STRUCTURE.md
+*.mmd
