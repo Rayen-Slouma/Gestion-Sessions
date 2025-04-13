@@ -26,7 +26,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
-import GraphicalExamScheduleCreator from '../../components/schedule/GraphicalExamScheduleCreator';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -1916,18 +1915,6 @@ const SessionFormPage: React.FC = () => {
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <Button
-              onClick={() => {
-                // Toggle the mode
-                setGraphicalMode(!graphicalMode);
-                // Reset the GraphicalExamScheduleCreator when switching to graphical mode
-                // This will ensure it starts with just one empty day
-              }}
-              sx={{ mb: 2 }}
-            >
-              {graphicalMode ? 'Toggle Manual Mode' : 'Toggle Graphical Mode'}
-            </Button>
-            {!graphicalMode ? (
             <Paper sx={{ p: 3 }}>
               <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Typography variant="h5" color="primary" fontWeight="500">
@@ -2419,12 +2406,6 @@ const SessionFormPage: React.FC = () => {
                 </Box>
               )}
             </Paper>
-            ) : (
-              <Box sx={{ p: 2, border: '2px solid #4472C4', borderRadius: 2 }}>
-                {/* Use a unique key based on the current timestamp to force a complete remount */}
-                <GraphicalExamScheduleCreator key={`graphical-creator-${Date.now()}`} />
-              </Box>
-            )}
           </TabPanel>
         </Paper>
       </Box>

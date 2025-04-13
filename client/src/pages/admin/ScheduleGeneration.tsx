@@ -28,7 +28,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { format } from 'date-fns';
 import ExamScheduleCreator from '../../components/schedule/ExamScheduleCreator';
-import GraphicalExamScheduleCreator from '../../components/schedule/GraphicalExamScheduleCreator';
 import SessionsList from '../../components/sessions/SessionsList';
 
 export {};
@@ -401,7 +400,6 @@ const ScheduleGeneration: React.FC = () => {
 
   // Tab state
   const [tabValue, setTabValue] = useState(0);
-  const [graphicalMode, setGraphicalMode] = useState(false);
 
   // Automatic generation state
   const [startDate, setStartDate] = useState<Date | null>(null);
