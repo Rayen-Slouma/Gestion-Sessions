@@ -253,20 +253,6 @@ The API follows RESTful conventions and is organized by resource type:
 - `PUT /api/sessions/:id`: Update a session (admin only)
 - `DELETE /api/sessions/:id`: Delete a session (admin only)
 
-## 🧪 Testing
-
-### Running Tests
-
-```bash
-# Client tests
-cd client
-npm test
-
-# Server tests
-cd server
-npm test
-```
-
 ## 📦 Deployment
 
 ### Production Build
@@ -296,9 +282,6 @@ npm run build
 4. Push to the branch (`git push origin feature/new-feature`)
 5. Create a new Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👏 Acknowledgements
 
@@ -308,7 +291,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - React for the frontend library
 - All contributors who have helped with the project
 
----
+@MedHabibManai and @NahdiSalim
 
 <div align="center">
   <p>Made with ❤️ for better university exam management</p>
