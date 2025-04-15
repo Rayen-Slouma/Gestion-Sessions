@@ -42,11 +42,11 @@ The University Exam Management System is a comprehensive web application designe
 ### For Administrators
 - 👨‍💼 **User Management**: Add, edit, and delete user accounts with different roles
 - 🏫 **Department & Section Management**: Organize academic structure
-- 📚 **Subject Management**: Manage subjects and their examination parameters
+- 📚 **Subject Management**: Manage subjects 
 - 👥 **Group Management**: Organize students into groups for exam sessions
-- 🏢 **Classroom Management**: Configure exam venues and their capacities
-- 📅 **Schedule Generation**: Create exam schedules manually or automatically
-- 📊 **Dashboard**: Comprehensive overview of system statistics and upcoming exams
+- 🏢 **Classroom Management**: Configure exam venues and their capacities and features
+- 📅 **Schedule Generation**: Create exam schedules and sessions list
+- 📊 **Dashboard**: Comprehensive overview of system statistics 
 
 ### For Teachers
 - 📝 **Supervision Schedule**: View assigned exam supervision duties
